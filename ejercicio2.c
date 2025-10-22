@@ -2,15 +2,17 @@
 #include <string.h>
 #include <ctype.h>
 
-void posicion_signo (char *palabra, int *ptr_posiciones) {
+void posicion_signo (char *palabra, int *ptr_posiciones, char *signos) {
 	int longitud_str = strlen (palabra);
 	
 	if (ispunct (palabra [0])) {
-		*ptr_posiciones = 1;
+		*ptr_posiciones = 1; //Si el primer elemento del string es un signo de puntiación guarda 1 en el primer espacio del arreglo
+		signos [0] = palabra [0];
 	}
 	
 	if (ispunct (palabra [longitud_str - 1])) {
-		*(ptr_posiciones + 1) = 1;
+		*(ptr_posiciones + 1) = 1; //Si el último elemento del string es un signo de puntiación guarda 1 en el último espacio del arreglo
+		signos [1] = palabra [longitud_str - 1] ;
 	}
 }
 
@@ -19,13 +21,13 @@ void quitar_signo (char *palabra, int *ptr_posiciones) {
 
 	if ( *ptr_posiciones == 1) {
 		for (int i = 0; i < longitud_str; i++) {
-		       palabra [i] = palabra [i + 1];
+		       palabra [i] = palabra [i + 1]; //Si el primer espacio del arreglo es 1, borra el primer elemento del string
 		}
 		palabra [longitud_str - 1] = '\0';
 	}
 
  	if (*(ptr_posiciones + 1) == 1) {
-		palabra [strlen (palabra) - 1] = '\0';
+		palabra [strlen (palabra) - 1] = '\0'; //Si el último espacio del arreglo es 1, borra el último elemento del string
 	}		
 }
 
@@ -59,14 +61,24 @@ void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palab
 	int contador = 0;
 	
 	while (fscanf (archivo_entrada, "%99s", palabra) == 1) {
-		int posiciones [2] = {0, 0};
+		int posiciones_signos [2] = {0, 0};
+		char signos [2];
 			
 		strcpy (palabra_limpia, palabra); 
-		posicion_signo (palabra_limpia, &posiciones [0]);
-		quitar_signo (palabra_limpia, &posiciones [0]); 
-		printf ("%s\n", palabra_limpia);	
+		posicion_signo (palabra_limpia, &posiciones_signos [0], signos); //Guarda las posiciones de los signos de puntuación en el arreglo posiciones_signos
+		quitar_signo (palabra_limpia, &posiciones_signos [0]); //Quita los signos basándose en las posiciones guardadas en el arreglo posiciones_signos
+		
 		if (strcasecmp (palabra_limpia, palabra_buscar) == 0) {
+			if (posiciones_signos [0] == 1) {
+				fputc (signos [0], archivo_salida);
+			}
+
 			fputs (palabra_reemplazo, archivo_salida); //Si la palabra sin signos es igual a la buscada de agrega el reemplazo en la salida
+			
+			if (posiciones_signos [1] == 1) {
+				fputc (signos [1], archivo_salida);
+                        }
+
 			contador++;
 		}
 		
@@ -87,7 +99,7 @@ void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palab
 int main (int argc, char *argv []) {
 	if (argc != 4) {
 		printf ("Error argumentos inválidos\n");
-		return;
+		return 1;
 	}
 		
 	char *nombre_archivo = argv [1];
