@@ -19,7 +19,7 @@ void quitar_signo (char *palabra, int posicion) {
 	if (posicion == -1) {
 		return;
 	}
-
+	
 	for (int i = posicion; i < longitud_str; i++) {
 		palabra [i] = palabra [i + 1];
 	}
@@ -27,15 +27,15 @@ void quitar_signo (char *palabra, int posicion) {
 
 void agregar_espacio_blanco (FILE *archivo_entrada, FILE *archivo_salida) {
 	int c = fgetc (archivo_entrada);
-
+	
 	if (c == '\n') {
 		fputc ('\n', archivo_salida);
 	}
-
+	
 	else if (c == ' ') {
 		fputc (' ', archivo_salida);
 	}
-
+	
 	if (c != EOF && c != '\n' && c != ' ') {
 		ungetc(c, archivo_entrada);
 	}
@@ -44,6 +44,10 @@ void agregar_espacio_blanco (FILE *archivo_entrada, FILE *archivo_salida) {
 void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palabra_reemplazo) {
 	FILE *archivo_entrada = fopen (nombre_archivo, "r");
 	FILE *archivo_salida = fopen ("archivo_salida.txt", "w");
+	
+	if (!archivo_entrada || !archivo_salida) {
+		printf ("Error no se pudieron abrir los archivos de entrada o salida");
+	}
 	
 	char palabra [100];
 	char palabra_limpia [100];
@@ -69,17 +73,21 @@ void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palab
 	
 	printf ("Palabra %s encontrada %d veces\n", palabra_buscar, contador);
 	printf ("Palabra %s reemplazada por %s\n", palabra_buscar, palabra_reemplazo);
-
+	
 	fclose (archivo_salida);
 	fclose (archivo_entrada);
 }
 
 int main (int argc, char *argv []) {
+	if (argc != 4) {
+		printf ("Error argumentos inválidos");
+	}
+		
 	char *nombre_archivo = argv [1];
 	char *palabra_buscar = argv [2];
 	char *palabra_reemplazo = argv [3];
 	
 	reemplazar_palabra (nombre_archivo, palabra_buscar, palabra_reemplazo);
-
+	
 	return 0;
 }
