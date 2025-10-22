@@ -2,27 +2,31 @@
 #include <string.h>
 #include <ctype.h>
 
-int posicion_signo (char *palabra) {
+void posicion_signo (char *palabra, int *ptr_posiciones) {
 	int longitud_str = strlen (palabra);
-
-	for (int i = 0; i < longitud_str; i++) {
-		if (ispunct (palabra [i])) {
-			return i; //Si el caracter es un signo de puntuación devuelve la posición del caracter
-		}
-	}	
-	return -1; //Si no hay signos de puntuación devuelve -1
+	
+	if (ispunct (palabra [0])) {
+		*ptr_posiciones = 1;
+	}
+	
+	if (ispunct (palabra [longitud_str - 1])) {
+		*(ptr_posiciones + 1) = 1;
+	}
 }
 
-void quitar_signo (char *palabra, int posicion) {
+void quitar_signo (char *palabra, int *ptr_posiciones) {
 	int longitud_str = strlen (palabra);
-	
-	if (posicion == -1) {
-		return; //Si la posición es -1 sale de la función
+
+	if ( *ptr_posiciones == 1) {
+		for (int i = 0; i < longitud_str; i++) {
+		       palabra [i] = palabra [i + 1];
+		}
+		palabra [longitud_str - 1] = '\0';
 	}
-	
-	for (int i = posicion; i < longitud_str; i++) {
-		palabra [i] = palabra [i + 1]; //Mueve los caractéres hacia la izquierda en la posición del signo de puntuación
-	}
+
+ 	if (*(ptr_posiciones + 1) == 1) {
+		palabra [strlen (palabra) - 1] = '\0';
+	}		
 }
 
 void agregar_espacio_blanco (FILE *archivo_entrada, FILE *archivo_salida) {
@@ -55,12 +59,13 @@ void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palab
 	int contador = 0;
 	
 	while (fscanf (archivo_entrada, "%99s", palabra) == 1) {
-		int posicion = posicion_signo(palabra); 
-		
+		int posiciones [2] = {0, 0};
+			
 		strcpy (palabra_limpia, palabra); 
-		quitar_signo (palabra_limpia, posicion); 
-		
-		if (strcmp (palabra_limpia, palabra_buscar) == 0) {
+		posicion_signo (palabra_limpia, &posiciones [0]);
+		quitar_signo (palabra_limpia, &posiciones [0]); 
+		printf ("%s\n", palabra_limpia);	
+		if (strcasecmp (palabra_limpia, palabra_buscar) == 0) {
 			fputs (palabra_reemplazo, archivo_salida); //Si la palabra sin signos es igual a la buscada de agrega el reemplazo en la salida
 			contador++;
 		}
