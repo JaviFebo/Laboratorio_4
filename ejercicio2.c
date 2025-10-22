@@ -1,16 +1,48 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
-void buscar_reemplazar (char *nombre_archivo, char *palabra_buscar, char *palabra_reemplazo) {
+int posicion_signo (char *palabra) {
+	int longitud_str = strlen (palabra);
+
+	for (int i = 0; i < longitud_str; i++) {
+		if (ispunct (palabra [i])) {
+			return i;
+		}
+	}	
+	return -1;
+}
+
+void quitar_signo (char *palabra, int posicion) {
+	int longitud_str = strlen (palabra);
+	
+	if (posicion == -1) {
+		return;
+	}
+
+	for (int i = posicion; i < longitud_str; i++) {
+		palabra [i] = palabra [i + 1];
+	}
+}
+
+void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palabra_reemplazo) {
 	FILE *archivo_entrada = fopen (nombre_archivo, "r");
 	FILE *archivo_salida = fopen ("archivo_salida.txt", "w");
-
+	
 	char palabra [100];
-        while (fscanf (archivo_entrada, "%99s", palabra) == 1) {
-                if (strcmp (palabra, palabra_buscar) == 0) {
-                       fputs (palabra_reemplazo, archivo_salida);
-		       fputs (" ", archivo_salida);
-                }
+	char palabra_limpia [100];
+
+	while (fscanf (archivo_entrada, "%99s", palabra) == 1) {
+		int posicion = posicion_signo(palabra);
+
+		strcpy (palabra_limpia, palabra);
+		quitar_signo (palabra_limpia, posicion);
+		printf ("%s\n", palabra_limpia);
+
+		if (strcmp (palabra_limpia, palabra_buscar) == 0) {
+			fputs (palabra_reemplazo, archivo_salida);
+			fputs (" ", archivo_salida);
+		}
 
 		else {
 			fputs (palabra, archivo_salida);
@@ -27,6 +59,7 @@ int main (int argc, char *argv []) {
 	char *palabra_buscar = argv [2];
 	char *palabra_reemplazo = argv [3];
 	
-	buscar_reemplazar (nombre_archivo, palabra_buscar, palabra_reemplazo);
+	reemplazar_palabra (nombre_archivo, palabra_buscar, palabra_reemplazo);
+
 	return 0;
 }
