@@ -25,6 +25,22 @@ void quitar_signo (char *palabra, int posicion) {
 	}
 }
 
+void agregar_espacio_blanco (FILE *archivo_entrada, FILE *archivo_salida) {
+	int c = fgetc (archivo_entrada);
+
+	if (c == '\n') {
+		fputc ('\n', archivo_salida);
+	}
+
+	else if (c == ' ') {
+		fputc (' ', archivo_salida);
+	}
+
+	if (c != EOF && c != '\n' && c != ' ') {
+		ungetc(c, archivo_entrada);
+	}
+}
+
 void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palabra_reemplazo) {
 	FILE *archivo_entrada = fopen (nombre_archivo, "r");
 	FILE *archivo_salida = fopen ("archivo_salida.txt", "w");
@@ -37,17 +53,16 @@ void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palab
 
 		strcpy (palabra_limpia, palabra);
 		quitar_signo (palabra_limpia, posicion);
-		printf ("%s\n", palabra_limpia);
 
 		if (strcmp (palabra_limpia, palabra_buscar) == 0) {
 			fputs (palabra_reemplazo, archivo_salida);
-			fputs (" ", archivo_salida);
 		}
 
 		else {
 			fputs (palabra, archivo_salida);
-			fputs (" ", archivo_salida);
 		}
+
+		agregar_espacio_blanco (archivo_entrada, archivo_salida);
         }
 	
 	fclose (archivo_salida);
