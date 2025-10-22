@@ -47,24 +47,29 @@ void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palab
 	
 	char palabra [100];
 	char palabra_limpia [100];
+	int contador = 0;
 
 	while (fscanf (archivo_entrada, "%99s", palabra) == 1) {
 		int posicion = posicion_signo(palabra);
-
+		
 		strcpy (palabra_limpia, palabra);
 		quitar_signo (palabra_limpia, posicion);
-
+		
 		if (strcmp (palabra_limpia, palabra_buscar) == 0) {
 			fputs (palabra_reemplazo, archivo_salida);
+			contador++;
 		}
-
+		
 		else {
 			fputs (palabra, archivo_salida);
 		}
-
+		
 		agregar_espacio_blanco (archivo_entrada, archivo_salida);
         }
 	
+	printf ("Palabra %s encontrada %d veces\n", palabra_buscar, contador);
+	printf ("Palabra %s reemplazada por %s\n", palabra_buscar, palabra_reemplazo);
+
 	fclose (archivo_salida);
 	fclose (archivo_entrada);
 }
