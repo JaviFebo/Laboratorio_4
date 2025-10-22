@@ -46,13 +46,14 @@ void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palab
 	FILE *archivo_salida = fopen ("archivo_salida.txt", "w");
 	
 	if (!archivo_entrada || !archivo_salida) {
-		printf ("Error no se pudieron abrir los archivos de entrada o salida");
+		printf ("Error no se pudieron abrir los archivos de entrada o salida\n");
+		return;
 	}
 	
 	char palabra [100];
 	char palabra_limpia [100];
 	int contador = 0;
-
+	
 	while (fscanf (archivo_entrada, "%99s", palabra) == 1) {
 		int posicion = posicion_signo(palabra); 
 		
@@ -80,7 +81,8 @@ void reemplazar_palabra (char *nombre_archivo, char *palabra_buscar, char *palab
 
 int main (int argc, char *argv []) {
 	if (argc != 4) {
-		printf ("Error argumentos inválidos");
+		printf ("Error argumentos inválidos\n");
+		return;
 	}
 		
 	char *nombre_archivo = argv [1];
